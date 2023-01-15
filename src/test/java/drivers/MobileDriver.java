@@ -1,11 +1,12 @@
 package drivers;
 
 import com.codeborne.selenide.WebDriverProvider;
+import config.MobileConfig;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
-import lombok.SneakyThrows;
+import org.aeonbits.owner.ConfigFactory;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,26 +27,27 @@ public class MobileDriver implements WebDriverProvider {
         }
     }
 
-    @SneakyThrows
     @Override
     public WebDriver createDriver(Capabilities capabilities) {
-        //
+
+        File app = getAppPath();
+
+        MobileConfig config = ConfigFactory.create(MobileConfig.class, System.getProperties());
 
         UiAutomator2Options options = new UiAutomator2Options();
         options.merge(capabilities);
 
         options.setAutomationName(ANDROID_UIAUTOMATOR2)
-                .setPlatformName("android")
-                .setDeviceName("Pixel 4 API 30")
-                .setPlatformVersion("11.0")
-                .setApp(getAppPath())
+                .setPlatformName(config.platformName())
+                .setDeviceName(config.deviceName())
+                .setPlatformVersion(config.platformVersion())
+                .setApp(app.getAbsolutePath())
                 .setAppPackage("org.wikipedia.alpha")
                 .setAppActivity("org.wikipedia.main.MainActivity");
-
-        return new RemoteWebDriver(getAppiumServerUrl(), options);
+        return new AndroidDriver(getAppiumServerUrl(), options);
     }
 
-    private String getAppPath() {
+    private File getAppPath() {
         // todo file moved from wiki github
         String appUrl = "https://github.com/wikimedia/apps-android-wikipedia/" +
                 "releases/download/latest/app-alpha-universal-release.apk";
@@ -59,6 +61,6 @@ public class MobileDriver implements WebDriverProvider {
                 throw new AssertionError("Failed to download application", e);
             }
         }
-        return app.getAbsolutePath();
+        return app;
     }
 }
