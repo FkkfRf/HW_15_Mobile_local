@@ -2,10 +2,16 @@ package config;
 
 import org.aeonbits.owner.Config;
 
-@Config.LoadPolicy(Config.LoadType.MERGE)
-@Config.Sources({"classpath:config/${deviceHost}.properties",
-        "classpath:config/credentials.properties"})
+@Config.LoadPolicy(Config.LoadType.MERGE) // объединяем в один config  параметры из разных properties
+@Config.Sources({"classpath:config/${deviceEmulate}.properties",
+         "classpath:config/emulation.properties"
+})
+
 public interface MobileConfig extends Config {
+    @Key("deviceEmulate")
+    @DefaultValue("emulation")
+    String deviceEmulate();
+
     @Key("deviceName")
     String deviceName();
 
@@ -16,5 +22,12 @@ public interface MobileConfig extends Config {
     @Key("platformVersion")
     String platformVersion();
 
-}
+    @Key("App")
+    String App();
+    @Key("loginBS")
+    String loginBS();
 
+    @Key("passwordBS")
+    String passwordBS();
+
+}
